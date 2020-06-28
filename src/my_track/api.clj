@@ -2,7 +2,7 @@
   (:require [clj-http.client :as http]
             [taoensso.timbre :as log]
             [cheshire.core :as json]
-            [java-time]
+            [java-time :as time]
             [reaver :as html]
             [clojure.set :as set]))
 
@@ -58,7 +58,7 @@
                          :f106 :change-unchanged-count
                          }))
 
-(defn- get-dapan
+(defn get-dapan
   "获取大盘状态"
   []
   (some-> (http/get "http://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&secids=1.000001,0.399001"
@@ -80,6 +80,8 @@
 (comment
 
   (get-guzhi "470009")
+
+  (get-dapan)
 
   (first (get-all-funds))
 
