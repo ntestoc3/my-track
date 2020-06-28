@@ -4,9 +4,10 @@
             [cheshire.core :as json]
             [java-time :as time]
             [reaver :as html]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [diehard.core :as dh]))
 
-(defn get-guzhi
+(defn- get-guzhi-raw
   "获取估值"
   [code]
   (some-> (http/get (format "http://fundgz.1234567.com.cn/js/%s.js" code))
@@ -19,6 +20,13 @@
           (update :gsz bigdec)
           (update :gszzl bigdec)
           ))
+
+(dh/defratelimiter api-limit {:rate 1})
+
+(defn get-guzhi
+  [code]
+  (dh/with-rate-limiter {:ratelimiter api-limit}
+    (get-guzhi-raw code)))
 
 (defn- parse-history
   "解析历史记录"
@@ -76,10 +84,19 @@
           json/decode
           (->> (map (partial zipmap [:code :short :name :type :full])))))
 
+(defn trading-day?
+  []
+  (-> (get-guzhi "000001")
+      :gztime
+      (time/time-between (time/local-date-time) :days)
+      zero?))
 
 (comment
 
   (get-guzhi "470009")
+
+
+  (get-guzhi "000001")
 
   (get-dapan)
 

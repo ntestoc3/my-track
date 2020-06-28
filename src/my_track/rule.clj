@@ -23,17 +23,19 @@
   "估值增长率上升"
   [FundInfo (> gszzl (config/get-config :guzhi-up))
    (= ?gszzl gszzl)
+   (= ?gztime gztime)
    (= ?name name)]
   =>
-  (notify-all-user (format "%s 估值%.2f%% !" ?name ?gszzl)))
+  (notify-all-user (format "[%s] %s 估值增长 %.2f%% !" ?gztime ?name ?gszzl)))
 
 (defrule guzhi-sink
   "估值增长率下降"
   [FundInfo (< gszzl (- (config/get-config :guzhi-down)))
    (= ?gszzl gszzl)
+   (= ?gztime gztime)
    (= ?name name)]
   =>
-  (notify-all-user (format "%s 估值%.2f%% !" ?name ?gszzl)))
+  (notify-all-user (format "[%s] %s 估值下降 %.2f%% !" ?gztime ?name (.abs ?gszzl))))
 
 (comment
 
