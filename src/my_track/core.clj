@@ -92,6 +92,7 @@
   [& args]
   (config/init-config {:cli-args args})
 
+  (log-ext/log-time-format!)
   (log-ext/log-to-file! (or (config/get-config :log-file)
                             "logs.log"))
 
