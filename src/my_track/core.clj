@@ -95,7 +95,8 @@
   (log-ext/log-to-file! (or (config/get-config :log-file)
                             "logs.log"))
 
-  (run-server #'all-routes {:port 8088})
+  (run-server #'all-routes {:port (or (config/get-config :server-port)
+                                      8088)})
   (log/info :http-server-ok)
   (doseq [cron-config (config/get-config :cron-configs)]
     (cron/make-cron CheckFundJob cron-config))

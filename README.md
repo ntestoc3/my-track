@@ -1,36 +1,40 @@
 # my-track
 
-FIXME: description
-
-## Installation
-
-Download from http://example.com/FIXME.
+基金预估追踪，并进行微信消息通知
 
 ## Usage
 
-FIXME: explanation
+### 1 注册微信消息推送WxPusher
+http://wxpusher.zjiecode.com/demo/
 
-    $ java -jar my-track-0.1.0-standalone.jar [args]
+设置回调地址 http://[server-ip]:8088/user/add
 
-## Options
+### 2 添加配置文件config.edn
 
-FIXME: listing of options this app accepts.
+```clojure
+{
+ :wxpush-token "" ;; 注册的微信push app-token
+ :shangzheng-up 2900 ;; 上证指数增长界限
+ :guzhi-up 1.0 ;; 估值增长界限
+ :guzhi-down 1.1 ;; 估值下降界限
+ :users #{}
+ :server-port 8088 ;; http服务监听端口
+ :funds-code ["470009" "470006"] ;; 基金代码
+ :cron-configs [{:job-key "funds-check.job.1"
+                 :trigger-key "funds-check.trigger.1"
+                 :schedule "0 50 14 ? * MON-FRI"} ;; 周一到周五，每天14:50执行
+                ]
+ }
+```
 
-## Examples
+### 3 运行主程序
+    $ java -jar my-track-0.1.0-standalone.jar 
 
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+    访问 http://[server-ip]:8088/qrcode  微信扫码，注册消息推送
 
 ## License
 
-Copyright © 2020 FIXME
+Copyright © 2020 ntestoc3
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
