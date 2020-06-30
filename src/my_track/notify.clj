@@ -3,12 +3,12 @@
    [wxpush.core :as wxpush]
    [common.config :as config]
    [taoensso.timbre :as log]
-   [diehard.core :as dh]))
+   [clojure.core.async :as async]
+   [diehard.core :as dh]
+   [clojure.string :as str]))
 
-
-(defn notify-all-user
-  [msg]
-  (log/info :notify msg)
+(defn send-messages
+  [msgs]
   (dh/with-retry {:retry-on Exception
                   :max-retries 5
                   :backoff-ms [500 5000]
@@ -23,4 +23,37 @@
                                                  "result:" r
                                                  "error:" e ", retring..."))}
     (wxpush/send-message (config/get-config :wxpush-token)
-                         msg)))
+                         (str/join "<br/>" msgs)
+                         {:content-type :html})))
+
+;; 超过10条消息就会阻塞
+(def msg-queue (async/chan 10))
+
+(def kill (async/chan))
+
+(defn start-message-service
+  []
+  (async/go-loop []
+    (Thread/sleep 3000)
+    (let [msgs (->> (repeatedly #(async/poll! msg-queue))
+                    (take-while identity))]
+      (when (seq msgs)
+        (send-messages msgs)))
+    (if (async/poll! kill)
+      (log/info "message service down!")
+      (recur))))
+
+(defn stop-message-service
+  []
+  (async/>!! kill true))
+
+(defn notify-all-user
+  [msg]
+  (log/info :notify msg)
+  (async/>!! msg-queue msg))
+
+(comment
+
+
+
+  )

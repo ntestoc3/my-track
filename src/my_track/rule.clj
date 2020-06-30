@@ -2,10 +2,20 @@
   (:require [clara.rules :refer :all]
             [my-track.notify :refer [notify-all-user]]
             [taoensso.timbre :as log]
-            [common.config :as config]))
+            [common.config :as config]
+            [my-track.api :as api]
+            [java-time :as time]))
 
 (defrecord DapanInfo [name today-new change-num change-percent])
 (defrecord FundInfo [name fundcode gztime gsz gszzl dwjz])
+
+(defn jump-style
+  [s]
+  (format "<p style='color:red'>%s</p>" s))
+
+(defn sink-style
+  [s]
+  (format "<p style='color:green'>%s</p>" s))
 
 (defrule shangzheng-up-3000
   [DapanInfo
@@ -14,10 +24,13 @@
    (= ?name name)
    (= ?today-new today-new)]
   =>
-  (notify-all-user (format "%s 突破%s,达到%.2f点！"
-                           ?name
-                           (config/get-config :shangzheng-up)
-                           ?today-new)))
+  (-> (format "[%s] %s 突破%s,达到%.2f点！"
+              (time/format "yyyy-MM-dd'T'H:m" (time/local-date-time))
+              ?name
+              (config/get-config :shangzheng-up)
+              ?today-new)
+      jump-style
+      notify-all-user))
 
 (defrule guzhi-jump
   "估值增长率上升"
@@ -26,7 +39,9 @@
    (= ?gztime gztime)
    (= ?name name)]
   =>
-  (notify-all-user (format "[%s] %s 估值增长 %.2f%% !" ?gztime ?name ?gszzl)))
+  (-> (format "[%s] %s 估值增长 %.2f%% !" ?gztime ?name ?gszzl)
+      jump-style
+      notify-all-user))
 
 (defrule guzhi-sink
   "估值增长率下降"
@@ -35,7 +50,9 @@
    (= ?gztime gztime)
    (= ?name name)]
   =>
-  (notify-all-user (format "[%s] %s 估值下降 %.2f%% !" ?gztime ?name (.abs ?gszzl))))
+  (-> (format "[%s] %s 估值下降 %.2f%% !" ?gztime ?name (.abs ?gszzl))
+      sink-style
+      notify-all-user))
 
 (comment
 
@@ -53,12 +70,15 @@
             ))
 
   (def dps (api/get-dapan))
+
   (def gz (assoc gz :gszzl 1.2))
+
+  (def gzz (->> (config/get-config :funds-code)
+                (map api/get-guzhi)))
 
   (-> (mk-session)
       (insert-all (map map->DapanInfo dps))
-      (insert (map->FundInfo g2))
-      (insert (map->FundInfo gz))
+      (insert-all (map map->FundInfo gzz))
       (fire-rules)
       )
 

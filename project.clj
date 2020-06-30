@@ -1,4 +1,4 @@
-(defproject my-track "0.1.0-SNAPSHOT"
+(defproject my-track "0.1.2-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [com.cerner/clara-rules "0.20.0"] ;; rule engine
                  [wxpush "0.1.1-SNAPSHOT"]
+                 [org.clojure/core.async "1.2.603"]
                  [reaver/reaver "0.1.3"]              ;html parser
                  [clojurewerkz/quartzite "2.1.0"] ;; cron
                  [ntestoc3/common "2.1.6-SNAPSHOT"]
