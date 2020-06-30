@@ -34,6 +34,7 @@
 (defn start-message-service
   []
   (async/go-loop []
+    ;; 3秒执行1次消息发送
     (Thread/sleep 3000)
     (let [msgs (->> (repeatedly #(async/poll! msg-queue))
                     (take-while identity))]
