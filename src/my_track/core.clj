@@ -11,6 +11,7 @@
             [common.log-ext :as log-ext]
             [my-track.api :as api]
             [my-track.rule :as rule]
+            [my-track.notify :as notify]
             [my-track.cron :as cron]
             [clara.rules :as cr]
             [taoensso.timbre :as log])
@@ -102,6 +103,7 @@
   (doseq [cron-config (config/get-config :cron-configs)]
     (cron/make-cron CheckFundJob cron-config))
   (clojure.repl/set-break-handler! shutdown)
+  (notify/start-message-service)
   (log/info :crontabs-ok)
   )
 
