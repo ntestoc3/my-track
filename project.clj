@@ -9,6 +9,7 @@
                  [org.clojure/core.async "1.2.603"]
                  [reaver/reaver "0.1.3"]              ;html parser
                  [clojurewerkz/quartzite "2.1.0"] ;; cron
+                 [com.stuartsierra/log.dev "0.2.0"] ;; log libs config
                  [ntestoc3/common "2.1.6-SNAPSHOT"]
                  [camel-snake-kebab/camel-snake-kebab "0.4.1"] ;; name convert
                  [compojure "1.6.1"]
