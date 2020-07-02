@@ -9,6 +9,7 @@
 
 (defn send-messages
   [msgs]
+  (log/info :send-messages)
   (dh/with-retry {:retry-on Exception
                   :max-retries 5
                   :backoff-ms [500 5000]
@@ -33,6 +34,7 @@
 
 (defn start-message-service
   []
+  (log/info :message-service-start)
   (async/go-loop []
     ;; 3秒执行1次消息发送
     (Thread/sleep 3000)

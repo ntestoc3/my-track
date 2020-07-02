@@ -85,6 +85,7 @@
 
 (defn shutdown [_]
   (log/warn :system-shutdown)
+  (notify/stop-message-service)
   (config/save-config!)
   (System/exit 0))
 
