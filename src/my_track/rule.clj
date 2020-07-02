@@ -17,7 +17,7 @@
   [s]
   (format "<p style='color:green'>%s</p>" s))
 
-(defrule shangzheng-up-3000
+(defrule shangzheng-up
   [DapanInfo
    (= name "上证指数")
    (> today-new (config/get-config :shangzheng-up))
@@ -31,6 +31,22 @@
               ?today-new)
       jump-style
       notify-all-user))
+
+(defrule shangzheng-down
+  [DapanInfo
+   (= name "上证指数")
+   (< today-new (config/get-config :shangzheng-down))
+   (= ?name name)
+   (= ?today-new today-new)]
+  =>
+  (-> (format "[%s] %s 跌破%s,达到%.2f点！"
+              (time/format "yyyy-MM-dd'T'H:m" (time/local-date-time))
+              ?name
+              (config/get-config :shangzheng-down)
+              ?today-new)
+      sink-style
+      notify-all-user))
+
 
 (defrule guzhi-jump
   "估值增长率上升"
