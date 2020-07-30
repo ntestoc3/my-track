@@ -37,7 +37,7 @@
   (log/info :message-service-start)
   (async/go-loop []
     ;; 3秒执行1次消息发送
-    (<! (async/timeout 3000))
+    (async/<! (async/timeout 3000))
     (let [msgs (->> (repeatedly #(async/poll! msg-queue))
                     (take-while identity))]
       (when (seq msgs)
