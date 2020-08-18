@@ -9,9 +9,9 @@
 
 (defn send-messages
   [msgs]
-  (log/info :send-messages)
+  (log/info :send-messages "count:" (count msgs))
   (dh/with-retry {:retry-on Exception
-                  :max-retries 5
+                  :max-retries 10
                   :backoff-ms [500 5000]
                   ;; 如果重试失败，则返回nil
                   :fallback (fn [r e]
@@ -23,9 +23,10 @@
                                        (log/warn :wxpush-notify
                                                  "result:" r
                                                  "error:" e ", retring..."))}
-    (wxpush/send-message (config/get-config :wxpush-token)
-                         (str/join "<br/>" msgs)
-                         {:content-type :html})))
+    (dh/with-timeout {:timeout-ms 5000}
+      (wxpush/send-message (config/get-config :wxpush-token)
+                           (str/join "<br/>" msgs)
+                           {:content-type :html}))))
 
 ;; 超过10条消息就会阻塞
 (def msg-queue (async/chan 10))
